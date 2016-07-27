@@ -11,6 +11,7 @@
 #include "tests_events_dispatch.h"
 #include "tests_events_fifo.h"
 #include "tests_sched.h"
+#include "tests_linux_simul.h"
 
 int main(void){
 	tests_state_machine_run();
@@ -18,5 +19,6 @@ int main(void){
 	tests_events_fifo_run();
 	tests_sched_run();
 	tests_timer_run();
+	tests_linux_simul_run();
 	return 0;
 }

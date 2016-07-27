@@ -7,9 +7,13 @@
  * Full text of license is in /LICENSE file
  */
 
-#ifndef KN_POWER_H
-#define KN_POWER_H
+#include "kn_platform.h"
+#include "kn_linux_sleep.h"
 
+int kn_platform_init(void){
+	return kn_platform_linux_sleep_init();
+}
 
-
-#endif //POWER_H
+int kn_platform_exit(void){
+	return kn_platform_linux_sleep_exit();
+}

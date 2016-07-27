@@ -217,10 +217,10 @@ START_TEST(kn_machine_init_with_states2)
 	int ret = kn_machine_init(&machine, STATE_1);
 
 	ck_assert(ret == 0);
-	ck_assert(top_state_init);
-	ck_assert(state0_init);
-	ck_assert(state1_init);
-	ck_assert(state2_init);
+	ck_assert(top_state_initialized);
+	ck_assert(state0_initialized);
+	ck_assert(state1_initialized);
+	ck_assert(state2_initialized);
 
 	ck_assert(machine.current_state==&states[STATE_1]);
 }

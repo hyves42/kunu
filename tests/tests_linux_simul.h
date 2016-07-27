@@ -7,9 +7,12 @@
  * Full text of license is in /LICENSE file
  */
 
-#ifndef KN_POWER_H
-#define KN_POWER_H
+#ifndef TESTS_LINUX_H
+#define TESTS_LINUX_H
+
+
+int tests_linux_simul_run(void);
 
 
 
-#endif //POWER_H
+#endif // TESTS_EVENTS_H
