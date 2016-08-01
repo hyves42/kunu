@@ -14,11 +14,12 @@
 #include "tests_linux_simul.h"
 
 int main(void){
-	tests_state_machine_run();
-	tests_events_dispatch_run();
-	tests_events_fifo_run();
-	tests_sched_run();
-	tests_timer_run();
-	tests_linux_simul_run();
-	return 0;
+	int fail_count=0;
+	fail_count+=tests_state_machine_run();
+	fail_count+=tests_events_dispatch_run();
+	fail_count+=tests_events_fifo_run();
+	fail_count+=tests_sched_run();
+	fail_count+=tests_timer_run();
+	fail_count+=tests_linux_simul_run();
+	return fail_count;
 }

@@ -18,6 +18,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/poll.h>
+#include <stdio.h>
+#include <errno.h>
 
 static int pipe_fd[2]={-1,-1};
 
@@ -52,14 +54,15 @@ int kn_platform_sleep_for(int ticks){
 		return -1;
 	}
 
-	while (1==poll(ufds, 1, 0)){
+	while (0<=poll(ufds, 1, 0)){
 		char c;
 		while(1==read(pipe_fd[read_id], &c, 1)){
 			if (c==tick_char){
 				count++;
 			}
 
-			if (count>=ticks || c==int_char){
+			if ((ticks > 0 && count>=ticks) 
+				|| (c==int_char)){
 				return 0;
 			}
 		}
@@ -68,26 +71,7 @@ int kn_platform_sleep_for(int ticks){
 }
 
 int kn_platform_sleep_forever(void){
-	struct pollfd ufds[1]={{
-		.fd=pipe_fd[read_id],
-		.events = POLLIN,
-	}};
-	int count=0;
-
-
-	if (pipe_fd[read_id]<0){
-		return -1;
-	}
-
-	while (1==poll(ufds, 1, 0)){
-		char c;
-		while(1==read(pipe_fd[read_id], &c, 1)){
-			if (c==int_char){
-				return 0;
-			}
-		}
-	}
-	return -1;
+	return kn_platform_sleep_for(0);
 }
 
 int kn_platform_linux_simulate_interrupt(void){
