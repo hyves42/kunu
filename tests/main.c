@@ -12,6 +12,7 @@
 #include "tests_events_fifo.h"
 #include "tests_sched.h"
 #include "tests_linux_simul.h"
+#include "tests_system.h"
 
 int main(void){
 	int fail_count=0;
@@ -21,5 +22,6 @@ int main(void){
 	fail_count+=tests_sched_run();
 	fail_count+=tests_timer_run();
 	fail_count+=tests_linux_simul_run();
+	fail_count+=tests_system_run();
 	return fail_count;
 }

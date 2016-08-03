@@ -14,6 +14,13 @@
 
 typedef struct kn_tick_controller_t kn_tick_controller_t;
 
+struct kn_tick_controller_t{
+	int dummy;
+};
+
+kn_tick_controller_t *kn_tick_controller_get_default(void);
+void kn_tick_controller_set_default(kn_tick_controller_t *c);
+
 int kn_tick_register_client(kn_tick_controller_t *c, kn_tick_client_t *client);
 
 int kn_tick_unregister_client(kn_tick_controller_t *c, kn_tick_client_t *client);

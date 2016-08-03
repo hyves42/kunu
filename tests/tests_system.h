@@ -11,7 +11,7 @@
 #define TESTS_SCHED_H
 
 
-int tests_sched_run(void);
+int tests_system_run(void);
 
 
 

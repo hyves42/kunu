@@ -8,6 +8,8 @@
  */
  
 #include "kn_timer.h"
+#include "kn_tick.h"
+#include "kn_sched.h"
 
 
 static void kn_timer_tick(int num_tick, void *user_data);
@@ -17,6 +19,7 @@ static int kn_timer_remaining_ticks(kn_schedulable_t *s, void* user_data);
 
 
 int kn_timer_init(kn_timer_t *t, int (*timer_cb)(kn_timer_t *timer, void *user_data), void *user_data, int priority){
+	int ret=0;
 	if (!t){
 		return -1;
 	}
@@ -40,7 +43,19 @@ int kn_timer_init(kn_timer_t *t, int (*timer_cb)(kn_timer_t *timer, void *user_d
 	t->tick_remaining=0;
 	t->is_armed=false;
 	t->must_repeat=false;
-	return 0;
+
+	// Register schedulable and tick_client interfaces
+	ret = kn_sched_add_schedulable(kn_sched_get_default(), s);
+	if (ret<0) goto fail;
+
+	ret = kn_tick_register_client(kn_tick_controller_get_default(), ti);
+	if (ret<0) goto fail;
+
+	return ret;
+fail:
+	kn_sched_remove_schedulable(kn_sched_get_default(), s);
+	kn_tick_unregister_client(kn_tick_controller_get_default(), ti);
+	return ret;
 }
 
 int kn_timer_start(kn_timer_t *t, int ms_interval){
@@ -80,7 +95,7 @@ int kn_timer_start_one_shot(kn_timer_t *t, int ms_interval){
 
 void kn_timer_tick(int num_tick, void *user_data){
 	kn_timer_t *t=(kn_timer_t*)user_data;
-	if (!t){
+	if (!t || !t->is_armed){
 		return;
 	}
 	t->tick_remaining-=num_tick;

@@ -12,6 +12,15 @@
 #include <stdio.h>
 
 
+static kn_sched_t *default_sched=NULL;
+
+kn_sched_t *kn_sched_get_default(void){
+	return default_sched;
+}
+void kn_sched_set_default(kn_sched_t *s){
+	default_sched=s;
+}
+
 
 int kn_sched_add_schedulable(kn_sched_t *s, kn_schedulable_t *schedulable){
 	int i;

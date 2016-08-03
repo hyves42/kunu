@@ -35,6 +35,7 @@ START_TEST(kn_linux_test_sleep_forever)
 		ck_assert(ret==0);
 		ck_assert(wokeup==true);
 	}
+	
 	void thread_under_test(sem_t *sem){
 		int ret=kn_platform_sleep_forever();
 		ck_assert(ret==0);

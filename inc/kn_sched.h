@@ -28,6 +28,8 @@ struct kn_sched_t{
 	.schedulable_count=0}
 
 
+kn_sched_t *kn_sched_get_default(void);
+void kn_sched_set_default(kn_sched_t *s);
 
 int kn_sched_add_schedulable(kn_sched_t *s, kn_schedulable_t *schedulable);
 int kn_sched_remove_schedulable(kn_sched_t *s, kn_schedulable_t *schedulable);

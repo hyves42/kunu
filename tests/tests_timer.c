@@ -9,6 +9,9 @@
 
 #include "tests_timer.h"
 #include "kn_timer.h"
+
+#include "kn_sched.h"
+#include "kn_tick.h"
 #include <check.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -20,6 +23,14 @@ START_TEST(timer_tests_init)
 {
 	int timer_cb(kn_timer_t *timer, void *user_data){}
 	kn_timer_t t={};
+
+	// These are needed for timer_init
+	kn_sched_t sched = SCHED_INIT_VALUE;
+	kn_tick_controller_t tic = {};
+	kn_sched_set_default(&sched);
+	kn_tick_controller_set_default(&tic);
+	//
+
 
 	int ret=kn_timer_init(&t, timer_cb, NULL, 1);
 
@@ -34,6 +45,7 @@ START_TEST(timer_tests_init)
 	ck_assert(KN_TIMER_GET_SCHEDULABLE(&t).state == SLEEPING);
 	ck_assert(t.is_armed == false);
 	ck_assert(KN_TIMER_GET_TICK_CLIENT(&t).tick != NULL);
+	//TODO verify that timer is in tick_controller list and in sched list
 }
 END_TEST
 
@@ -49,6 +61,14 @@ START_TEST(timer_tests_simple_sched)
 		ck_assert(user_data == (void*)0xdeadbeef);
 		cb_called=true;
 	}
+
+
+	// These are needed for timer_init
+	kn_sched_t sched = SCHED_INIT_VALUE;
+	kn_tick_controller_t tic = {};
+	kn_sched_set_default(&sched);
+	kn_tick_controller_set_default(&tic);
+	//
 
 
 	int ret=kn_timer_init(&t, timer_cb, (void*)0xdeadbeef, 1);
@@ -82,6 +102,7 @@ START_TEST(timer_tests_simple_sched)
 	r = s->schedule(s, s->user_data);
 	ck_assert(r == DID_NOTHING);
 	ck_assert(cb_called==false);
+	//TODO verify that timer is in tick_controller list and in sched list
 }
 END_TEST
 
