@@ -11,6 +11,9 @@
 #include "kn_tick.h"
 #include "kn_sched.h"
 
+ //TODO add a 'class method' to init a local sched and thck controller
+ // instead of calling  kn_sched_get_default() and kn_tick_controller_get_default() always
+
 
 static void kn_timer_tick(int num_tick, void *user_data);
 static kn_schedulable_return_t kn_timer_schedule(kn_schedulable_t *s, void* user_data);

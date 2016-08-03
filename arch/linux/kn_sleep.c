@@ -63,7 +63,7 @@ int kn_platform_sleep_for(int ticks){
 
 			if ((ticks > 0 && count>=ticks) 
 				|| (c==int_char)){
-				return 0;
+				return count;
 			}
 		}
 	}

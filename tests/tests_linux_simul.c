@@ -63,7 +63,7 @@ START_TEST(kn_linux_test_sleep_1tick)
 
 	void thread_under_test(sem_t *sem){
 		int ret=kn_platform_sleep_for(1);
-		ck_assert(ret==0);
+		ck_assert(ret==1);
 		wokeup=true;
 		sem_post(sem);
 	}
@@ -90,7 +90,7 @@ START_TEST(kn_linux_test_sleep_100tick)
 
 	void thread_under_test(sem_t *sem){
 		int ret=kn_platform_sleep_for(100);
-		ck_assert(ret==0);
+		ck_assert(ret==100);
 		wokeup=true;
 		sem_post(sem);
 	}
@@ -173,7 +173,7 @@ START_TEST(kn_linux_test_sleep_1tick_doesnt_exit)
 
 	void thread_under_test(sem_t *sem){
 		int ret=kn_platform_sleep_for(2);
-		ck_assert(ret==0);
+		ck_assert(ret==2);
 		wokeup=true;
 		sem_post(sem);
 	}

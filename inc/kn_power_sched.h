@@ -11,8 +11,9 @@
 #define KN_POWER_SCHED_H
 
 #include "kn_sched.h"
+#include "kn_tick.h"
 
-int kn_power_sched_init(kn_sched_t* s);
+int kn_power_sched_init(kn_sched_t* s, kn_tick_controller_t *t);
 
 int kn_power_sched_run(void);
 

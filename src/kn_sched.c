@@ -86,9 +86,11 @@ int kn_sched_step(kn_sched_t *s){
 		return -1;
 	}
 
+	//printf("s->schedulable_count %d\n", s->schedulable_count);
 	for (i=0; i<s->schedulable_count; i++){
 		kn_schedulable_t *se = s->schedulables[i];
 
+		//printf("se->state= %d\n", se->state);
 		if (se->state==NEEDS_SCHEDULE || se->state==WAITING){
 			kn_schedulable_return_t ret = se->schedule(se, se->user_data);
 			if (ret == DID_SOMETHING){
@@ -109,9 +111,15 @@ unsigned int sched_get_remaining_ticks(kn_sched_t *s){
 	for (i=0; i<s->schedulable_count; i++){
 		kn_schedulable_t *se = s->schedulables[i];
 
-		if (se->remaining_ticks && se->state == WAITING){
+		if (se->state==NEEDS_SCHEDULE){
+			// no tick remaining, this one needs to be scheduled now
+			return 0;
+		}
+
+		if (se->remaining_ticks){
 			int t = se->remaining_ticks(se, se->user_data);
-			if (t >= 0 && t < ticks){
+			//printf("se->remaining_ticks() returned %d\n", t);
+			if (t >= 0 && (ticks<0 || t < ticks)){
 				ticks=t;
 			}
 		}
