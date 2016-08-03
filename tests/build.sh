@@ -9,4 +9,4 @@ gcc ../src/kn_state.c ../src/kn_events_dispatch.c ../src/kn_events_fifo.c\
 	tests_system.c thread_helper.c\
 	../arch/linux/kn_sleep.c ../arch/linux/kn_platform.c\
 	main.c -o test\
-	-I. -I../inc -I../arch/linux `pkg-config --cflags check` `pkg-config --libs check` -lpthread
+	-I. -I../inc -I../arch/linux `pkg-config --cflags check` `pkg-config --libs check` -lpthread -lrt
