@@ -9,34 +9,44 @@
  
 #include "kn_events_dispatch.h"
 #include <stdio.h> //for debug printf and NULL
-static kn_event_reg_entry_t* map=NULL;
-static int map_size=0;
-static int map_elements_count=0;
 
 
-int kn_events_init(kn_event_reg_entry_t* a_map, int a_map_size){
+
+int kn_events_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* a_map, int a_map_size){
 	int i=0;
 
-	if (!a_map || a_map_size==0){
+	if (!disp || !a_map || a_map_size==0){
 		return -1;
 	}
-	map=a_map;
-	map_size=a_map_size;
-	for (; i<map_size; i++){
-		if (map[i].id==0 || map[i].reg==NULL) break;
+	disp->map=a_map;
+	disp->map_size=a_map_size;
+
+	// if a_map is already an ordered map of subscribers. accept it as is
+	// Just perform some basic safety tests
+	int last_id=0;
+	for (; i<a_map_size; i++){
+		int id = a_map[i].id;
+		if (id==0 || a_map[i].reg==NULL) break;
+		if (id<last_id){
+			disp->map_elements_count=0;
+			// This is forbidden, a_map should either be empty or correctly ordered
+			return -1;
+		}
+		last_id=id;
 	}
-	map_elements_count=i;
+	disp->map_elements_count=i;
+	return 0;
 }
 
-int kn_events_register_subscriber_array(kn_event_reg_t* array, int elt_count){
+int kn_events_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count){
 	int i=0;
 	int ret=0;
-	if (!array){
+	if (!disp || !array){
 		return -1;
 	}
 
 	for (i=0; i<elt_count; i++){
-		ret=kn_events_register_subscriber(&array[i]);
+		ret=kn_events_register_subscriber(disp, &array[i]);
 		if (ret<0){
 			return ret;
 		}
@@ -44,37 +54,37 @@ int kn_events_register_subscriber_array(kn_event_reg_t* array, int elt_count){
 	return 0;
 }
 
-int kn_events_register_subscriber(kn_event_reg_t* event_reg){
+int kn_events_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event_reg){
 	int i=0, j=0;
 	int id;
-	if (!event_reg){
+	if (!disp || !event_reg){
 		return -1;
 	}
-	if (map_elements_count>=map_size){
+	if (disp->map_elements_count>=disp->map_size){
 		//no room left
 		return -1;
 	}
 	id=event_reg->id;
 
-	if (map[0].id==0){
-		map[0].id=id;
-		map[0].reg=event_reg;
-		map_elements_count=1;
+	if (disp->map[0].id==0){
+		disp->map[0].id=id;
+		disp->map[0].reg=event_reg;
+		disp->map_elements_count=1;
 		return 0;
 	}
 
-	for (i=1; i<map_size; i++){
-		if ((map[i].id==0)
-			||((map[i].id>=id) && (map[i-1].id<=id))){
+	for (i=1; i<disp->map_size; i++){
+		if ((disp->map[i].id==0)
+			||((disp->map[i].id>=id) && (disp->map[i-1].id<=id))){
 			
 			//Make room
-			for (j=map_elements_count; j>i; --j){
-				map[j]=map[j-1]; //yup that's legal
+			for (j=disp->map_elements_count; j>i; --j){
+				disp->map[j]=disp->map[j-1]; //yup that's legal
 			}
-			map_elements_count++;
+			disp->map_elements_count++;
 
-			map[i].id=id;
-			map[i].reg=event_reg;
+			disp->map[i].id=id;
+			disp->map[i].reg=event_reg;
 			return 0;
 		}
 	}
@@ -83,25 +93,32 @@ int kn_events_register_subscriber(kn_event_reg_t* event_reg){
 }
 
 
-int kn_events_get_registered_count(void){
-	return map_elements_count;
+int kn_events_get_registered_count(kn_event_dispatcher_t *disp){
+	if (!disp){
+		return -1;
+	}
+	return disp->map_elements_count;
 }
 
 
 
-int kn_events_broadcast(int id, void *data){
-	int i;
-	int min=0, max=map_elements_count;
-	if (!map || !map_elements_count){
+int kn_events_broadcast(kn_event_dispatcher_t *disp, int id, void *data){
+	if (!disp || !disp->map){
+		return -1;
+	}
+	if (!disp->map_elements_count){
 		return 0;
 	}
+
+	int i=0;
+	int min=0, max=disp->map_elements_count;
 
 	//printf("Looking for id %d\n", id);
 
 	// Find 1st occurence of id in ordered map by dichotomy
 	// Not a classic dichotomy because id may be present several times
 	while ((max-min)>1){
-		if (map[min].id == id){
+		if (disp->map[min].id == id){
 			//found it trivially
 			i=min;
 			//printf("->found=%d\n", i);
@@ -109,7 +126,7 @@ int kn_events_broadcast(int id, void *data){
 		}
 		i=min+(max-min)/2;
 		//printf("min %d, max %d, i %d, id[i] %d\n", min, max, i, map[i].id);
-		if (map[i].id == id){
+		if (disp->map[i].id == id){
 			// We are close to the solution, so dealing with edge cases
 			if (i==(min+1)){
 				// That's it, we found the first occurence of id
@@ -120,7 +137,7 @@ int kn_events_broadcast(int id, void *data){
 				//printf("->max=%d\n", max);
 			}
 		}
-		else if (map[i].id < id){
+		else if (disp->map[i].id < id){
 			min=i;
 			//printf("->min=%d\n", min);
 		}
@@ -129,9 +146,12 @@ int kn_events_broadcast(int id, void *data){
 			//printf("->max=%d\n", max);
 		}
 	}
-	while(map[i].id==id){
-		if (map[i].reg && map[i].reg->handler){
-			map[i].reg->handler(id, data, map[i].reg->user_data);
+
+	// index i is noow the 1st occurence of 'id' in the map
+	// Broadcast message to all occurences
+	while(disp->map[i].id==id){
+		if (disp->map[i].reg && disp->map[i].reg->handler){
+			disp->map[i].reg->handler(id, data, disp->map[i].reg->user_data);
 		}
 		i++;
 	}

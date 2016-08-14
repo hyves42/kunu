@@ -14,6 +14,7 @@
 
 typedef struct kn_event_reg_t kn_event_reg_t;
 typedef struct kn_event_reg_entry_t kn_event_reg_entry_t;
+typedef struct kn_event_dispatcher_t kn_event_dispatcher_t;
 
 
 // struct event_t{
@@ -37,6 +38,14 @@ struct kn_event_reg_entry_t{
 	kn_event_reg_t *reg;
 };
 
+
+struct kn_event_dispatcher_t{
+	kn_event_reg_entry_t* map;
+	int map_size;
+	int map_elements_count;
+};
+
+
 //dans l'implementaation de la machine
 //on d'eclare
 // struct registered[]={
@@ -46,16 +55,16 @@ struct kn_event_reg_entry_t{
 // }
 
 
-int kn_events_init(kn_event_reg_entry_t* map, int map_count);
+int kn_events_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* map, int map_count);
 
-int kn_events_register_subscriber_array(kn_event_reg_t* array, int elt_count);
-int kn_events_register_subscriber(kn_event_reg_t* event);
-
-
-int kn_events_get_registered_count(void);
+int kn_events_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count);
+int kn_events_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event);
 
 
-int kn_events_broadcast(int id, void *data);
+int kn_events_get_registered_count(kn_event_dispatcher_t *disp);
+
+
+int kn_events_broadcast(kn_event_dispatcher_t *disp, int id, void *data);
 
 
 #endif //KN_EVENTS_H
