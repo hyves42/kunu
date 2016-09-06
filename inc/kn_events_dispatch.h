@@ -17,20 +17,16 @@ typedef struct kn_event_reg_entry_t kn_event_reg_entry_t;
 typedef struct kn_event_dispatcher_t kn_event_dispatcher_t;
 
 
-// struct event_t{
-// 	int id;
-// 	int timestamp;
-// 	void *data;
-// };
-
-
 
 
 
 struct kn_event_reg_t{
 	int id;
 	void *user_data;
-	int (*handler)(int evt_id, void *evt_data, void *user_data);
+	// This is not the same prototype as kn_event_worker_t
+	// And this is on purpose. 
+	// My idea here is to have one lightweight callback per type of event inside of the worker
+	int (*handler)(kn_event_t *event, void *user_data);
 };
 
 struct kn_event_reg_entry_t{
@@ -40,6 +36,7 @@ struct kn_event_reg_entry_t{
 
 
 struct kn_event_dispatcher_t{
+	kn_event_worker_t worker;
 	kn_event_reg_entry_t* map;
 	int map_size;
 	int map_elements_count;
@@ -55,16 +52,16 @@ struct kn_event_dispatcher_t{
 // }
 
 
-int kn_events_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* map, int map_count);
+int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* map, int map_count);
 
-int kn_events_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count);
-int kn_events_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event);
-
-
-int kn_events_get_registered_count(kn_event_dispatcher_t *disp);
+int kn_eventdisp_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count);
+int kn_eventdisp_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event);
 
 
-int kn_events_broadcast(kn_event_dispatcher_t *disp, int id, void *data);
+int kn_eventdisp_get_registered_count(kn_event_dispatcher_t *disp);
+
+
+int kn_eventdisp_broadcast(kn_event_dispatcher_t *disp, kn_event_t *event);
 
 
 #endif //KN_EVENTS_H

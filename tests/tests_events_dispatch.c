@@ -39,38 +39,38 @@ static void reset_states(void){
 	handler5_count=0;
 }
 
-static int event_handler1(int evt_id, void *evt_data, void *user_data){
-	ck_assert(evt_id==1);
+static int event_handler1(kn_event_t *event, void *user_data){
+	ck_assert(event->id==1);
 	handler1_called=true;
 	handler1_count++;
 	return 0;
 }
-static int event_handler2(int evt_id, void *evt_data, void *user_data){
-	ck_assert(evt_id==2);
+static int event_handler2(kn_event_t *event, void *user_data){
+	ck_assert(event->id==2);
 	handler2_called=true;
 	handler2_count++;
 	return 0;
 }
-static int event_handler3(int evt_id, void *evt_data, void *user_data){
-	ck_assert(evt_id==3);
+static int event_handler3(kn_event_t *event, void *user_data){
+	ck_assert(event->id==3);
 	handler3_called=true;
 	handler3_count++;
 	return 0;
 }
-static int event_handler4(int evt_id, void *evt_data, void *user_data){
-	ck_assert(evt_id==4);
+static int event_handler4(kn_event_t *event, void *user_data){
+	ck_assert(event->id==4);
 	handler4_called=true;
 	handler4_count++;
 	return 0;
 }
-static int event_handler5(int evt_id, void *evt_data, void *user_data){
-	ck_assert(evt_id==5);
+static int event_handler5(kn_event_t *event, void *user_data){
+	ck_assert(event->id==5);
 	handler5_called=true;
 	handler5_count++;
 	return 0;
 }
 
-static int dummy_handler(int evt_id, void *evt_data, void *user_data){
+static int dummy_handler(kn_event_t *event, void *user_data){
 	return 0;
 }
 
@@ -80,7 +80,7 @@ START_TEST(events_tests_init)
 {
 	kn_event_reg_entry_t map[10]={};
 	int map_count=10;
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 
 	ck_assert(ret==0);
 }
@@ -97,12 +97,12 @@ START_TEST(events_tests_init2)
 		.handler=dummy_handler
 	};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber(&disp, &reg);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==1);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==1);
 
 	ck_assert(map[0].id==reg.id);
 	ck_assert(map[0].reg==&reg);
@@ -125,16 +125,16 @@ START_TEST(events_tests_init3)
 		.handler=dummy_handler
 	};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber(&disp, &reg1);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg1);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==1);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==1);
 
-	ret=kn_events_register_subscriber(&disp, &reg2);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg2);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==2);	
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==2);	
 
 	ck_assert(map[0].id==reg1.id);
 	ck_assert(map[0].reg==&reg1);
@@ -156,16 +156,16 @@ START_TEST(events_tests_init4)
 		.handler=dummy_handler
 	};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber(&disp, &reg);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==1);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==1);
 
-	ret=kn_events_register_subscriber(&disp, &reg);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg);
 	ck_assert(ret==-1);
-	ck_assert(kn_events_get_registered_count(&disp)==1);	
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==1);	
 }
 END_TEST
 
@@ -201,28 +201,28 @@ START_TEST(events_tests_init5)
 		.handler=dummy_handler
 	};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber(&disp, &reg1);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg1);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==1);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==1);
 
-	ret=kn_events_register_subscriber(&disp, &reg5);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg5);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==2);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==2);
 
-	ret=kn_events_register_subscriber(&disp, &reg2);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg2);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==3);	
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==3);	
 
-	ret=kn_events_register_subscriber(&disp, &reg4);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg4);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==4);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==4);
 
-	ret=kn_events_register_subscriber(&disp, &reg3);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg3);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==5);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
 	ck_assert(map[0].id==reg1.id);
 	ck_assert(map[0].reg==&reg1);
@@ -277,28 +277,28 @@ START_TEST(events_tests_init6)
 		.handler=dummy_handler
 	};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber(&disp, &reg1);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg1);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==1);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==1);
 
-	ret=kn_events_register_subscriber(&disp, &reg5);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg5);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==2);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==2);
 
-	ret=kn_events_register_subscriber(&disp, &reg2);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg2);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==3);	
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==3);	
 
-	ret=kn_events_register_subscriber(&disp, &reg4);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg4);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==4);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==4);
 
-	ret=kn_events_register_subscriber(&disp, &reg3);
+	ret=kn_eventdisp_register_subscriber(&disp, &reg3);
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==5);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
 	ck_assert(map[0].id==reg1.id);
 	ck_assert(map[0].reg==&reg1);
@@ -346,12 +346,12 @@ START_TEST(events_tests_array)
 		.handler=dummy_handler
 	}};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
+	ret=kn_eventdisp_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==5);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
 	ck_assert(map[0].id==array[0].id);
 	ck_assert(map[0].reg==&array[0]);
@@ -395,12 +395,12 @@ START_TEST(events_tests_array2)
 		.handler=dummy_handler
 	}};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
+	ret=kn_eventdisp_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
 	ck_assert(ret<0);
-	ck_assert(kn_events_get_registered_count(&disp)==3);	
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==3);	
 }
 END_TEST
 
@@ -412,8 +412,8 @@ START_TEST(events_tests_broadcast)
 	int map_count=6;
 	bool handler_called=false;
 
-	int handler3(int evt_id, void *evt_data, void *user_data){
-		ck_assert(evt_id==3);
+	int handler3(kn_event_t *event, void *user_data){
+		ck_assert(event->id==3);
 		handler_called=true;
 		return 0;
 	}
@@ -441,14 +441,19 @@ START_TEST(events_tests_broadcast)
 		.handler=dummy_handler
 	}};
 
-	int ret=kn_events_init(&disp, map, map_count);
+
+	kn_event_t evt={
+		.id=3
+	};
+	
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
-	ret=kn_events_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
+	ret=kn_eventdisp_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==5);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
-	ret=kn_events_broadcast(&disp, 3, NULL);
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
 	ck_assert(handler_called);
 }
@@ -487,24 +492,31 @@ START_TEST(events_tests_broadcast2)
 		.handler=event_handler5
 	}};
 
-	int ret=kn_events_init(&disp, map, map_count);
+	kn_event_t evt={};
+
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
 	reset_states();
 
-	ret=kn_events_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
+	ret=kn_eventdisp_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==5);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
-	ret=kn_events_broadcast(&disp, 1, NULL);
+	evt.id=1;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 2, NULL);
+	evt.id=2;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 3, NULL);
+	evt.id=3;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 4, NULL);
+	evt.id=4;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 5, NULL);
+	evt.id=5;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
 
 	ck_assert(handler1_count==1);
@@ -554,27 +566,34 @@ START_TEST(events_tests_broadcast3)
 		.handler=event_handler5
 	}};
 
+	kn_event_t evt={};
+
 	kn_event_reg_entry_t map[sizeof(array)/sizeof(array[0])]={};
 	int map_count=sizeof(array)/sizeof(array[0]);
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
 	reset_states();
 
-	ret=kn_events_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
+	ret=kn_eventdisp_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==sizeof(array)/sizeof(array[0]));
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==sizeof(array)/sizeof(array[0]));
 
-	ret=kn_events_broadcast(&disp, 1, NULL);
+	evt.id=1;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 2, NULL);
+	evt.id=2;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 3, NULL);
+	evt.id=3;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 4, NULL);
+	evt.id=4;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
-	ret=kn_events_broadcast(&disp, 5, NULL);
+	evt.id=5;
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
 
 	ck_assert(handler1_count==1);
@@ -624,19 +643,23 @@ START_TEST(events_tests_broadcast4)
 		.handler=event_handler5
 	}};
 
+	kn_event_t evt={
+		.id=6
+	};
+
 	kn_event_reg_entry_t map[sizeof(array)/sizeof(array[0])]={};
 	int map_count=sizeof(array)/sizeof(array[0]);
 
-	int ret=kn_events_init(&disp, map, map_count);
+	int ret=kn_eventdisp_init(&disp, map, map_count);
 	ck_assert(ret==0);
 
 	reset_states();
 
-	ret=kn_events_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
+	ret=kn_eventdisp_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
 	ck_assert(ret==0);
-	ck_assert(kn_events_get_registered_count(&disp)==sizeof(array)/sizeof(array[0]));
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==sizeof(array)/sizeof(array[0]));
 
-	ret=kn_events_broadcast(&disp, 6, NULL);
+	ret=kn_eventdisp_broadcast(&disp, &evt);
 	ck_assert(ret==0);
 
 	ck_assert(handler1_count==0);

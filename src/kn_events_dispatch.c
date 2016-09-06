@@ -10,9 +10,10 @@
 #include "kn_events_dispatch.h"
 #include <stdio.h> //for debug printf and NULL
 
+static void kn_eventdisp_on_event(kn_event_worker_t *worker, kn_event_t *event);
 
 
-int kn_events_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* a_map, int a_map_size){
+int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* a_map, int a_map_size){
 	int i=0;
 
 	if (!disp || !a_map || a_map_size==0){
@@ -20,6 +21,11 @@ int kn_events_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* a_map, int
 	}
 	disp->map=a_map;
 	disp->map_size=a_map_size;
+
+	disp->worker.on_event=kn_eventdisp_on_event;
+	disp->worker.user_data=disp;
+
+
 
 	// if a_map is already an ordered map of subscribers. accept it as is
 	// Just perform some basic safety tests
@@ -38,7 +44,7 @@ int kn_events_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* a_map, int
 	return 0;
 }
 
-int kn_events_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count){
+int kn_eventdisp_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count){
 	int i=0;
 	int ret=0;
 	if (!disp || !array){
@@ -46,7 +52,7 @@ int kn_events_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_re
 	}
 
 	for (i=0; i<elt_count; i++){
-		ret=kn_events_register_subscriber(disp, &array[i]);
+		ret=kn_eventdisp_register_subscriber(disp, &array[i]);
 		if (ret<0){
 			return ret;
 		}
@@ -54,7 +60,7 @@ int kn_events_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_re
 	return 0;
 }
 
-int kn_events_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event_reg){
+int kn_eventdisp_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event_reg){
 	int i=0, j=0;
 	int id;
 	if (!disp || !event_reg){
@@ -93,7 +99,7 @@ int kn_events_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* e
 }
 
 
-int kn_events_get_registered_count(kn_event_dispatcher_t *disp){
+int kn_eventdisp_get_registered_count(kn_event_dispatcher_t *disp){
 	if (!disp){
 		return -1;
 	}
@@ -101,8 +107,16 @@ int kn_events_get_registered_count(kn_event_dispatcher_t *disp){
 }
 
 
+void kn_eventdisp_on_event(kn_event_worker_t *worker, kn_event_t *event){
+	kn_event_dispatcher_t *disp=(kn_event_dispatcher_t *)worker->user_data;
+	if (disp){
+		kn_eventdisp_broadcast(disp, event);
+	}
+}
 
-int kn_events_broadcast(kn_event_dispatcher_t *disp, int id, void *data){
+
+
+int kn_eventdisp_broadcast(kn_event_dispatcher_t *disp, kn_event_t *event){
 	if (!disp || !disp->map){
 		return -1;
 	}
@@ -112,6 +126,7 @@ int kn_events_broadcast(kn_event_dispatcher_t *disp, int id, void *data){
 
 	int i=0;
 	int min=0, max=disp->map_elements_count;
+	int id=event->id;
 
 	//printf("Looking for id %d\n", id);
 
@@ -151,7 +166,7 @@ int kn_events_broadcast(kn_event_dispatcher_t *disp, int id, void *data){
 	// Broadcast message to all occurences
 	while(disp->map[i].id==id){
 		if (disp->map[i].reg && disp->map[i].reg->handler){
-			disp->map[i].reg->handler(id, data, disp->map[i].reg->user_data);
+			disp->map[i].reg->handler(event, disp->map[i].reg->user_data);
 		}
 		i++;
 	}
