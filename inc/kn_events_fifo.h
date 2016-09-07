@@ -54,4 +54,6 @@ int kn_fifo_count(kn_fifo_t*f);
 
 int kn_fifo_free(kn_fifo_t*f);
 
+//TODO add some way to send events to an event_worker, and an event worker interface maybe
+
 #endif //KN_FIFO_H

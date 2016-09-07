@@ -7,6 +7,7 @@
  * Full text of license is in /LICENSE file
  */
  
+#include "tests_component.h"
 #include "tests_state_machine.h"
 #include "tests_events_dispatch.h"
 #include "tests_events_fifo.h"
@@ -23,5 +24,6 @@ int main(void){
 	fail_count+=tests_timer_run();
 	fail_count+=tests_linux_simul_run();
 	fail_count+=tests_system_run();
+	fail_count+=tests_component_run();
 	return fail_count;
 }

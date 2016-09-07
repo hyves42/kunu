@@ -44,6 +44,10 @@ struct kn_event_dispatcher_t{
 // 	EVENT_REGISTER(event_id, callback, user_data)
 // }
 
+#define KN_EVENT_REGISTER(_event_id, _callback, _user_data){\
+	.id=_event_id,\
+	.user_data=_user_data,\
+	.handler=_callback}
 
 
 #define KN_EVENTDISP_INIT_WITH_FIXED_MAP(_disp, _map){\
