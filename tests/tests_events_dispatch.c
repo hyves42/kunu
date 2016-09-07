@@ -78,17 +78,20 @@ static kn_event_dispatcher_t disp={};
 
 START_TEST(events_tests_init)
 {
-	kn_event_reg_entry_t map[10]={};
+	kn_event_reg_t map[10]={};
 	int map_count=10;
 	int ret=kn_eventdisp_init(&disp, map, map_count);
 
 	ck_assert(ret==0);
+
+	ck_assert(disp.worker.on_event==kn_eventdisp_on_event);
+	ck_assert(disp.worker.user_data==&disp);
 }
 END_TEST
 
 START_TEST(events_tests_init2)
 {
-	kn_event_reg_entry_t map[10]={};
+	kn_event_reg_t map[10]={};
 	int map_count=10;
 
 	kn_event_reg_t reg={
@@ -105,13 +108,14 @@ START_TEST(events_tests_init2)
 	ck_assert(kn_eventdisp_get_registered_count(&disp)==1);
 
 	ck_assert(map[0].id==reg.id);
-	ck_assert(map[0].reg==&reg);
+	ck_assert(map[0].user_data==reg.user_data);
+	ck_assert(map[0].handler==reg.handler);
 }
 END_TEST
 
 START_TEST(events_tests_init3)
 {
-	kn_event_reg_entry_t map[2]={};
+	kn_event_reg_t map[2]={};
 	int map_count=2;
 
 	kn_event_reg_t reg1={
@@ -137,17 +141,20 @@ START_TEST(events_tests_init3)
 	ck_assert(kn_eventdisp_get_registered_count(&disp)==2);	
 
 	ck_assert(map[0].id==reg1.id);
-	ck_assert(map[0].reg==&reg1);
+	ck_assert(map[0].user_data==reg1.user_data);
+	ck_assert(map[0].handler==reg1.handler);
+
 
 	ck_assert(map[1].id==reg2.id);
-	ck_assert(map[1].reg==&reg2);	
+	ck_assert(map[1].user_data==reg2.user_data);
+	ck_assert(map[1].handler==reg2.handler);	
 }
 END_TEST
 
-//Check that we can't register more eventss than the size of the registered events array
+//Check that we can't register more events than the size of the registered events array
 START_TEST(events_tests_init4)
 {
-	kn_event_reg_entry_t map[1]={};
+	kn_event_reg_t map[1]={};
 	int map_count=1;
 
 	kn_event_reg_t reg={
@@ -172,7 +179,7 @@ END_TEST
 //Check ordering
 START_TEST(events_tests_init5)
 {
-	kn_event_reg_entry_t map[6]={};
+	kn_event_reg_t map[6]={};
 	int map_count=6;
 
 	kn_event_reg_t reg1={
@@ -224,22 +231,26 @@ START_TEST(events_tests_init5)
 	ck_assert(ret==0);
 	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
+
 	ck_assert(map[0].id==reg1.id);
-	ck_assert(map[0].reg==&reg1);
+	ck_assert(map[0].user_data==reg1.user_data);
+	ck_assert(map[0].handler==reg1.handler);
 
 	ck_assert(map[1].id==reg2.id);
-	ck_assert(map[1].reg==&reg2);	
+	ck_assert(map[1].user_data==reg2.user_data);
+	ck_assert(map[1].handler==reg2.handler);
 
 	ck_assert(map[2].id==reg3.id);
-	ck_assert(map[2].reg==&reg3);	
+	ck_assert(map[2].user_data==reg3.user_data);
+	ck_assert(map[2].handler==reg3.handler);
 
 	ck_assert(map[3].id==reg4.id);
-	ck_assert(map[3].reg==&reg4);	
+	ck_assert(map[3].user_data==reg4.user_data);
+	ck_assert(map[3].handler==reg4.handler);
 
 	ck_assert(map[4].id==reg5.id);
-	ck_assert(map[4].reg==&reg5);	
-	
-
+	ck_assert(map[4].user_data==reg5.user_data);
+	ck_assert(map[4].handler==reg5.handler);
 }
 END_TEST
 
@@ -248,7 +259,7 @@ END_TEST
 //Check ordering
 START_TEST(events_tests_init6)
 {
-	kn_event_reg_entry_t map[6]={};
+	kn_event_reg_t map[6]={};
 	int map_count=6;
 
 	kn_event_reg_t reg1={
@@ -301,27 +312,21 @@ START_TEST(events_tests_init6)
 	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
 	ck_assert(map[0].id==reg1.id);
-	ck_assert(map[0].reg==&reg1);
 
 	ck_assert(map[1].id==reg2.id);
-	ck_assert(map[1].reg==&reg2);	
 
 	ck_assert((map[2].id==reg3.id) || (map[2].id==reg4.id));
-	ck_assert((map[2].reg==&reg3) || (map[2].reg==&reg4));
 
 	ck_assert((map[3].id==reg3.id) || (map[3].id==reg4.id));
-	ck_assert((map[3].reg==&reg3) || (map[3].reg==&reg4));	
 
 	ck_assert(map[4].id==reg5.id);
-	ck_assert(map[4].reg==&reg5);
 }
 END_TEST
 
 
-//Check ordering
 START_TEST(events_tests_array)
 {
-	kn_event_reg_entry_t map[6]={};
+	kn_event_reg_t map[6]={};
 	int map_count=6;
 
 	kn_event_reg_t array[]={{
@@ -354,23 +359,21 @@ START_TEST(events_tests_array)
 	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
 
 	ck_assert(map[0].id==array[0].id);
-	ck_assert(map[0].reg==&array[0]);
 	ck_assert(map[1].id==array[1].id);
-	ck_assert(map[1].reg==&array[1]);	
 	ck_assert(map[2].id==array[2].id);
-	ck_assert(map[2].reg==&array[2]);	
 	ck_assert(map[3].id==array[3].id);
-	ck_assert(map[3].reg==&array[3]);	
 	ck_assert(map[4].id==array[4].id);
-	ck_assert(map[4].reg==&array[4]);	
 	
 }
 END_TEST
 
+
+
+
 //Test failure when we try to register too big an array
 START_TEST(events_tests_array2)
 {
-	kn_event_reg_entry_t map[3]={};
+	kn_event_reg_t map[3]={};
 	int map_count=3;
 
 	kn_event_reg_t array[]={{
@@ -405,10 +408,47 @@ START_TEST(events_tests_array2)
 END_TEST
 
 
-//Check ordering
+START_TEST(events_tests_static_init)
+{
+
+	kn_event_reg_t array[]={{
+		.id=1,
+		.user_data=NULL,
+		.handler=dummy_handler
+	},{
+		.id=2,
+		.user_data=NULL,
+		.handler=dummy_handler
+	},{
+		.id=3,
+		.user_data=NULL,
+		.handler=dummy_handler
+	},{
+		.id=4,
+		.user_data=NULL,
+		.handler=dummy_handler
+	},{
+		.id=5,
+		.user_data=NULL,
+		.handler=dummy_handler
+	}};
+
+	kn_event_dispatcher_t disp=KN_EVENTDISP_INIT_WITH_FIXED_MAP(disp, array);
+
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
+
+	ck_assert(disp.map==array);
+	ck_assert(disp.worker.on_event==kn_eventdisp_on_event);
+	ck_assert(disp.worker.user_data==&disp);
+	
+}
+END_TEST
+
+
+//Check broadcast of 1 event
 START_TEST(events_tests_broadcast)
 {
-	kn_event_reg_entry_t map[6]={};
+	kn_event_reg_t map[6]={};
 	int map_count=6;
 	bool handler_called=false;
 
@@ -463,10 +503,9 @@ END_TEST
 
 
 
-//Check ordering
 START_TEST(events_tests_broadcast2)
 {
-	kn_event_reg_entry_t map[6]={};
+	kn_event_reg_t map[6]={};
 	int map_count=6;
 
 
@@ -529,7 +568,6 @@ START_TEST(events_tests_broadcast2)
 END_TEST
 
 
-//Check ordering
 START_TEST(events_tests_broadcast3)
 {
 	kn_event_reg_t array[]={{
@@ -568,7 +606,7 @@ START_TEST(events_tests_broadcast3)
 
 	kn_event_t evt={};
 
-	kn_event_reg_entry_t map[sizeof(array)/sizeof(array[0])]={};
+	kn_event_reg_t map[sizeof(array)/sizeof(array[0])]={};
 	int map_count=sizeof(array)/sizeof(array[0]);
 
 	int ret=kn_eventdisp_init(&disp, map, map_count);
@@ -606,7 +644,6 @@ START_TEST(events_tests_broadcast3)
 END_TEST
 
 
-//Check ordering
 START_TEST(events_tests_broadcast4)
 {
 	kn_event_reg_t array[]={{
@@ -647,7 +684,7 @@ START_TEST(events_tests_broadcast4)
 		.id=6
 	};
 
-	kn_event_reg_entry_t map[sizeof(array)/sizeof(array[0])]={};
+	kn_event_reg_t map[sizeof(array)/sizeof(array[0])]={};
 	int map_count=sizeof(array)/sizeof(array[0]);
 
 	int ret=kn_eventdisp_init(&disp, map, map_count);
@@ -671,6 +708,62 @@ START_TEST(events_tests_broadcast4)
 }
 END_TEST
 
+
+START_TEST(events_tests_event_worker_interface)
+{
+	kn_event_reg_t map[6]={};
+	int map_count=6;
+	bool handler_called=false;
+
+	int handler3(kn_event_t *event, void *user_data){
+		ck_assert(event->id==3);
+		handler_called=true;
+		return 0;
+	}
+
+
+	kn_event_reg_t array[]={{
+		.id=1,
+		.user_data=NULL,
+		.handler=dummy_handler
+	},{
+		.id=2,
+		.user_data=NULL,
+		.handler=dummy_handler
+	},{
+		.id=3,
+		.user_data=NULL,
+		.handler=handler3
+	},{
+		.id=4,
+		.user_data=NULL,
+		.handler=dummy_handler
+	},{
+		.id=5,
+		.user_data=NULL,
+		.handler=dummy_handler
+	}};
+
+
+	kn_event_t evt={
+		.id=3
+	};
+	
+	int ret=kn_eventdisp_init(&disp, map, map_count);
+	ck_assert(ret==0);
+
+	ret=kn_eventdisp_register_subscriber_array(&disp, array, sizeof(array)/sizeof(array[0]));
+	ck_assert(ret==0);
+	ck_assert(kn_eventdisp_get_registered_count(&disp)==5);
+
+	// Test the generic worker interface
+	ret=kn_event_send_to_worker(&disp.worker, &evt);
+
+	ck_assert(ret==0);
+	ck_assert(handler_called);
+}
+END_TEST
+
 int tests_events_dispatch_run(void){
 	Suite *s1 = suite_create("Events");
 	TCase *tc1_1 = tcase_create("Events");
@@ -686,11 +779,12 @@ int tests_events_dispatch_run(void){
 	tcase_add_test(tc1_1, events_tests_init6);
 	tcase_add_test(tc1_1, events_tests_array);
 	tcase_add_test(tc1_1, events_tests_array2);
+	tcase_add_test(tc1_1, events_tests_static_init);
 	tcase_add_test(tc1_1, events_tests_broadcast);
 	tcase_add_test(tc1_1, events_tests_broadcast2);
 	tcase_add_test(tc1_1, events_tests_broadcast3);
 	tcase_add_test(tc1_1, events_tests_broadcast4);
-
+	tcase_add_test(tc1_1, events_tests_event_worker_interface);
 
 	srunner_run_all(sr, CK_ENV);
 	nf = srunner_ntests_failed(sr);

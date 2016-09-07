@@ -18,13 +18,13 @@ typedef struct kn_fifo_t kn_fifo_t;
 
 struct kn_fifo_t{
 	kn_event_t *buf;
-	unsigned int size;
+	unsigned int size; //number of elements in buf[], not a size in bytes
 	unsigned int read;
 	unsigned int write;
 	unsigned int mask;
 };
 
-//Valud fifo sizes. Must be a power of 2
+//Value of authorized fifo sizes. Must be a power of 2, or the magic won't work
 typedef enum {
 	FIFO_SIZE_2=2,
 	FIFO_SIZE_4=4,
@@ -34,6 +34,15 @@ typedef enum {
 	FIFO_SIZE_64=64,
 	//etc
 }kn_fifo_size_t;
+
+//This macro only works if buf is a statically allocated array of a size defined in kn_fifo_size_t
+//  If you use this macro for initialization, there is no need to call kn_fifo_init()
+#define KN_FIFO_INIT(buf) {\
+	.buf=buf,\
+	.size=sizeof(buf)/sizeof((buf)[0]),\
+	.mask=(sizeof(buf)/sizeof((buf)[0]))-1,\
+	.read=0,\
+	.write=0}
 
 int kn_fifo_init(kn_fifo_t*f, kn_event_t *buf, kn_fifo_size_t size); //size must be a power of 2
 

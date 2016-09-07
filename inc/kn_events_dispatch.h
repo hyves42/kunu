@@ -13,7 +13,6 @@
 #include "kn_event.h"
 
 typedef struct kn_event_reg_t kn_event_reg_t;
-typedef struct kn_event_reg_entry_t kn_event_reg_entry_t;
 typedef struct kn_event_dispatcher_t kn_event_dispatcher_t;
 
 
@@ -24,20 +23,14 @@ struct kn_event_reg_t{
 	int id;
 	void *user_data;
 	// This is not the same prototype as kn_event_worker_t
-	// And this is on purpose. 
-	// My idea here is to have one lightweight callback per type of event inside of the worker
+	// I'm still not sure if this is a good idea or not
 	int (*handler)(kn_event_t *event, void *user_data);
-};
-
-struct kn_event_reg_entry_t{
-	int id;
-	kn_event_reg_t *reg;
 };
 
 
 struct kn_event_dispatcher_t{
 	kn_event_worker_t worker;
-	kn_event_reg_entry_t* map;
+	kn_event_reg_t* map;
 	int map_size;
 	int map_elements_count;
 };
@@ -52,7 +45,27 @@ struct kn_event_dispatcher_t{
 // }
 
 
-int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* map, int map_count);
+
+#define KN_EVENTDISP_INIT_WITH_FIXED_MAP(_disp, _map){\
+	.map=(_map),\
+	.map_size=sizeof(_map)/sizeof((_map)[0]),\
+	.map_elements_count=sizeof(_map)/sizeof((_map)[0]),\
+	.worker={\
+		.on_event=kn_eventdisp_on_event,\
+		.user_data=&(_disp)}}
+
+#define KN_EVENTDISP_INIT_WITH_EMPTY_MAP(_disp, _map){\
+	.map=(_map),\
+	.map_size=sizeof(_map)/sizeof((_map)[0]),\
+	.map_elements_count=0,\
+	.worker={\
+		.on_event=kn_eventdisp_on_event,\
+		.user_data=&(_disp)}}
+
+
+
+//Public interface
+int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_t* map, int map_count);
 
 int kn_eventdisp_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count);
 int kn_eventdisp_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event);
@@ -62,6 +75,13 @@ int kn_eventdisp_get_registered_count(kn_event_dispatcher_t *disp);
 
 
 int kn_eventdisp_broadcast(kn_event_dispatcher_t *disp, kn_event_t *event);
+
+
+//Protected interface. 
+//These functions need to be declared here to allow static initialization of struct
+//But you are not supposed to call them directly
+
+int kn_eventdisp_on_event(kn_event_worker_t *worker, kn_event_t *event);
 
 
 #endif //KN_EVENTS_H

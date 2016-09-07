@@ -20,7 +20,7 @@
 
 
 
-START_TEST(kn_system_test_init)
+START_TEST(kn_system_test_timer)
 {
 	kn_timer_t t={};
 	sem_t timer_sem;
@@ -108,7 +108,7 @@ int tests_system_run(void){
 
 
 	suite_add_tcase(s1, tc1_1);
-	tcase_add_test(tc1_1, kn_system_test_init);
+	tcase_add_test(tc1_1, kn_system_test_timer);
 
 	kn_platform_init();
 

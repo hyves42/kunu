@@ -10,10 +10,9 @@
 #include "kn_events_dispatch.h"
 #include <stdio.h> //for debug printf and NULL
 
-static void kn_eventdisp_on_event(kn_event_worker_t *worker, kn_event_t *event);
 
 
-int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* a_map, int a_map_size){
+int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_t* a_map, int a_map_size){
 	int i=0;
 
 	if (!disp || !a_map || a_map_size==0){
@@ -32,7 +31,7 @@ int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_entry_t* a_map, 
 	int last_id=0;
 	for (; i<a_map_size; i++){
 		int id = a_map[i].id;
-		if (id==0 || a_map[i].reg==NULL) break;
+		if (id==0) break;
 		if (id<last_id){
 			disp->map_elements_count=0;
 			// This is forbidden, a_map should either be empty or correctly ordered
@@ -73,8 +72,7 @@ int kn_eventdisp_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t
 	id=event_reg->id;
 
 	if (disp->map[0].id==0){
-		disp->map[0].id=id;
-		disp->map[0].reg=event_reg;
+		disp->map[0]= *event_reg;
 		disp->map_elements_count=1;
 		return 0;
 	}
@@ -89,8 +87,7 @@ int kn_eventdisp_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t
 			}
 			disp->map_elements_count++;
 
-			disp->map[i].id=id;
-			disp->map[i].reg=event_reg;
+			disp->map[i] = *event_reg;
 			return 0;
 		}
 	}
@@ -107,11 +104,12 @@ int kn_eventdisp_get_registered_count(kn_event_dispatcher_t *disp){
 }
 
 
-void kn_eventdisp_on_event(kn_event_worker_t *worker, kn_event_t *event){
+int kn_eventdisp_on_event(kn_event_worker_t *worker, kn_event_t *event){
 	kn_event_dispatcher_t *disp=(kn_event_dispatcher_t *)worker->user_data;
 	if (disp){
-		kn_eventdisp_broadcast(disp, event);
+		return kn_eventdisp_broadcast(disp, event);
 	}
+	return -1;
 }
 
 
@@ -162,11 +160,11 @@ int kn_eventdisp_broadcast(kn_event_dispatcher_t *disp, kn_event_t *event){
 		}
 	}
 
-	// index i is noow the 1st occurence of 'id' in the map
+	// index i is now the 1st occurence of 'id' in the map
 	// Broadcast message to all occurences
 	while(disp->map[i].id==id){
-		if (disp->map[i].reg && disp->map[i].reg->handler){
-			disp->map[i].reg->handler(event, disp->map[i].reg->user_data);
+		if (disp->map[i].handler){
+			disp->map[i].handler(event, disp->map[i].user_data);
 		}
 		i++;
 	}

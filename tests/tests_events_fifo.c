@@ -26,6 +26,20 @@ START_TEST(kn_fifo_tests_init)
 END_TEST
 
 
+START_TEST(kn_fifo_tests_init_static)
+{
+	kn_event_t buf[FIFO_SIZE_8];
+	kn_fifo_t fifo=KN_FIFO_INIT(buf);
+
+	ck_assert(fifo.size == FIFO_SIZE_8);
+	ck_assert(fifo.mask == 0x7);
+	ck_assert(fifo.read==0);
+	ck_assert(fifo.write==0);
+	ck_assert(fifo.buf==buf);
+}
+END_TEST
+
+
 START_TEST(kn_fifo_tests_post_limit)
 {
 	kn_event_t buf[FIFO_SIZE_4];
@@ -166,6 +180,7 @@ int tests_events_fifo_run(void){
 
 	suite_add_tcase(s1, tc1_1);
 	tcase_add_test(tc1_1, kn_fifo_tests_init);
+	tcase_add_test(tc1_1, kn_fifo_tests_init_static);
 	tcase_add_test(tc1_1, kn_fifo_tests_post_limit);
 	tcase_add_test(tc1_1, kn_fifo_tests_post_wrap);
 	tcase_add_test(tc1_1, kn_fifo_test_thread_safety);

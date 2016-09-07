@@ -24,20 +24,19 @@ struct kn_event_t{
 // You only have one type of data to manipulate
 struct kn_event_worker_t{
 	// choose what you want. Not sure if this is useful
-	unsigned int id; 
+	unsigned int rtti_id; 
 	// Can be null if the worker only sends events
 	// Worker is the recipient of the event
 	// event is the event. it is advised to provide the event->sender reference
 
-	void (*on_event)(kn_event_worker_t *worker, kn_event_t *event);
+	int (*on_event)(kn_event_worker_t *worker, kn_event_t *event);
 	void *user_data;
 };
 
 // Prototype is (kn_event_worker_t *worker, kn_event_t *event)
 #define kn_event_send_to_worker(worker, event)  \
-	if ((worker) && (worker)->on_event){        \
-		(worker)->on_event((worker), (event));  \
-	}
+	(((worker) && (worker)->on_event)?(worker)->on_event((worker), (event)):-1);  
+	
 
 
 
