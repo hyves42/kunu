@@ -20,7 +20,7 @@ static int dummy_remaining_ticks(kn_schedulable_t *s, void* user_data){}
 
 START_TEST(kn_sched_tests_init)
 {
-	kn_sched_t sched=SCHED_INIT_VALUE;
+	kn_sched_t sched=KN_SCHED_INIT_VALUE;
 
 	ck_assert(sched.schedulable_count == 0);
 	ck_assert(sched.schedulables[0] == NULL);
@@ -31,7 +31,7 @@ END_TEST
 
 START_TEST(kn_sched_tests_add_schedulables)
 {
-	kn_sched_t sched=SCHED_INIT_VALUE;
+	kn_sched_t sched=KN_SCHED_INIT_VALUE;
 	int i;
 
 	kn_schedulable_t schedable1={
@@ -98,7 +98,7 @@ END_TEST
 
 START_TEST(kn_sched_tests_add_schedulables2)
 {
-	kn_sched_t sched=SCHED_INIT_VALUE;
+	kn_sched_t sched=KN_SCHED_INIT_VALUE;
 	int i;
 
 	kn_schedulable_t schedable1={
@@ -166,7 +166,7 @@ END_TEST
 
 START_TEST(kn_sched_tests_add_schedulables_limit)
 {
-	kn_sched_t sched=SCHED_INIT_VALUE;
+	kn_sched_t sched=KN_SCHED_INIT_VALUE;
 	int i, ret;
 
 	kn_schedulable_t schedable={
@@ -189,7 +189,7 @@ END_TEST
 
 START_TEST(kn_sched_tests_add_bad_schedulables)
 {
-	kn_sched_t sched=SCHED_INIT_VALUE;
+	kn_sched_t sched=KN_SCHED_INIT_VALUE;
 	int i, ret;
 
 	kn_schedulable_t schedable={
@@ -208,7 +208,7 @@ END_TEST
 
 START_TEST(kn_sched_tests_remove_schedulables)
 {
-	kn_sched_t sched=SCHED_INIT_VALUE;
+	kn_sched_t sched=KN_SCHED_INIT_VALUE;
 	int i;
 
 	kn_schedulable_t schedable1={

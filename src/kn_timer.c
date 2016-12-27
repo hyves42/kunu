@@ -21,7 +21,7 @@ static int kn_timer_remaining_ticks(kn_schedulable_t *s, void* user_data);
 
 
 
-int kn_timer_init(kn_timer_t *t, int (*timer_cb)(kn_timer_t *timer, void *user_data), void *user_data, int priority){
+int kn_timer_init(kn_timer_t *t, void (*timer_cb)(kn_timer_t *timer, void *user_data), void *user_data, int priority){
 	int ret=0;
 	if (!t){
 		return -1;
@@ -66,6 +66,9 @@ int kn_timer_start(kn_timer_t *t, int ms_interval){
 		return -1;
 	}
 	int tick_interval=MS_TO_TICK(ms_interval);
+	if (tick_interval == 0){
+		return -1;
+	}
 
 	t->tick_interval=tick_interval;
 	t->tick_remaining=tick_interval;

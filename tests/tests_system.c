@@ -29,7 +29,7 @@ START_TEST(kn_system_test_timer)
 	// This is the timer callback. 
 	// As it will be called in a thread under test, 
 	// I'm signaling the main thread that it was called
-	int timer_cb(kn_timer_t *timer, void *user_data){
+	void timer_cb(kn_timer_t *timer, void *user_data){
 		//printf("timer timer_cb\n");
 		sem_post(&timer_sem);
 		timer_called = true;
@@ -37,7 +37,7 @@ START_TEST(kn_system_test_timer)
 
 	
 	// These are needed for timer_init
-	kn_sched_t sched = SCHED_INIT_VALUE;
+	kn_sched_t sched = KN_SCHED_INIT_VALUE;
 	kn_tick_controller_t tic = {};
 	kn_sched_set_default(&sched);
 	kn_tick_controller_set_default(&tic);

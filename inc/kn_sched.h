@@ -23,7 +23,7 @@ struct kn_sched_t{
 };
 
 
-#define SCHED_INIT_VALUE {\
+#define KN_SCHED_INIT_VALUE {\
 	.schedulables={},\
 	.schedulable_count=0}
 

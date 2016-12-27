@@ -20,7 +20,7 @@ struct kn_timer_t{
 	kn_schedulable_t schedulable;
 	kn_tick_client_t tick;
 	void *user_data;
-	int (*timer_cb)(kn_timer_t *timer, void *user_data);
+	void (*timer_cb)(kn_timer_t *timer, void *user_data);
 	int tick_interval;
 	int tick_remaining;
 	bool is_armed;
@@ -31,7 +31,7 @@ struct kn_timer_t{
 #define KN_TIMER_GET_TICK_CLIENT(t) ((t)->tick)
 
 //Public interface
-int kn_timer_init(kn_timer_t *t, int (*timer_cb)(kn_timer_t *timer, void *user_data), void *user_data, int priority);
+int kn_timer_init(kn_timer_t *t, void (*timer_cb)(kn_timer_t *timer, void *user_data), void *user_data, int priority);
 
 int kn_timer_start(kn_timer_t *t, int ms_interval);
 
