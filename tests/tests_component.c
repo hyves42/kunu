@@ -13,7 +13,8 @@ START_TEST(component_tests_init)
 		KN_EVENT_REGISTER(2, NULL, NULL),
 		KN_EVENT_REGISTER(3, NULL, NULL),
 	};
-	kn_component_t component=KN_COMPONENT_INIT(component, buf, disp_map);
+	kn_event_reg_t out_disp_map[10]={};
+	kn_component_t component=KN_COMPONENT_INIT(component, buf, disp_map, out_disp_map);
 
 
 	ck_assert(component.worker_if.user_data==&component);
@@ -25,7 +26,7 @@ START_TEST(component_tests_init)
 	ck_assert(component.events_fifo.buf==buf);
 	ck_assert(component.events_fifo.size==FIFO_SIZE_32);
 
-	ck_assert(component.dispatcher.map_size==3);
+	ck_assert(component.input_disp.map_size==3);
 
 }
 END_TEST

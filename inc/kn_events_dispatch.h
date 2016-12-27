@@ -36,8 +36,7 @@ struct kn_event_dispatcher_t{
 };
 
 
-//dans l'implementaation de la machine
-//on d'eclare
+// In the real implementation, events registering lists are declared like :
 // struct registered[]={
 // 	EVENT_REGISTER(event_id, callback, user_data)
 // 	EVENT_REGISTER(event_id, callback, user_data)

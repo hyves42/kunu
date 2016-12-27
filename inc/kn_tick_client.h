@@ -11,10 +11,10 @@
 #define KN_TICK_CLIENT_H
 
 //How many ms between two ticks ?
-#define TICK_PERIOD 10
+#define TICK_PERIOD_MS 10
 
-#define MS_TO_TICK(a)  ((a)/TICK_PERIOD)
-#define TICK_TO_MS(a)  ((a)*TICK_PERIOD)
+#define MS_TO_TICK(a)  ((a)/TICK_PERIOD_MS)
+#define TICK_TO_MS(a)  ((a)*TICK_PERIOD_MS)
 
 typedef struct kn_tick_client_t kn_tick_client_t;
 

@@ -37,10 +37,10 @@ typedef enum {
 
 //This macro only works if buf is a statically allocated array of a size defined in kn_fifo_size_t
 //  If you use this macro for initialization, there is no need to call kn_fifo_init()
-#define KN_FIFO_INIT(buf) {\
-	.buf=buf,\
-	.size=sizeof(buf)/sizeof((buf)[0]),\
-	.mask=(sizeof(buf)/sizeof((buf)[0]))-1,\
+#define KN_FIFO_INIT(_buf) {\
+	.buf=(_buf),\
+	.size=sizeof(_buf)/sizeof((_buf)[0]),\
+	.mask=(sizeof(_buf)/sizeof((_buf)[0]))-1,\
 	.read=0,\
 	.write=0}
 
