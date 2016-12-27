@@ -16,5 +16,6 @@ int kn_platform_linux_simulate_interrupt(void);
 
 int kn_platform_linux_simulate_tick(void);
 
+void kn_platform_linux_start_tick_thread(void);
 
 #endif

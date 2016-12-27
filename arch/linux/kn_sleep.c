@@ -14,12 +14,14 @@
 // hw interrupts or tick interrupts by writing into a pipe, thus waking the other thread
 
 #include "kn_linux_sleep.h"
+#include "kn_tick.h"
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/poll.h>
 #include <stdio.h>
 #include <errno.h>
+#include <pthread.h>
 
 static int pipe_fd[2]={-1,-1};
 
@@ -54,7 +56,7 @@ int kn_platform_sleep_for(int ticks){
 		return -1;
 	}
 
-	while (0<=poll(ufds, 1, 0)){
+	while (0<=poll(ufds, 1, -1)){
 		char c;
 		while(1==read(pipe_fd[read_id], &c, 1)){
 			if (c==tick_char){
@@ -86,4 +88,23 @@ int kn_platform_linux_simulate_tick(void){
 		return -1;
 	}
 	return (1==write(pipe_fd[write_id], &tick_char, sizeof(tick_char)));
+}
+
+
+
+// Useful for mocking quick and dirty test applications in linux
+// Start a thread that simulates a tick interrupt
+void kn_platform_linux_start_tick_thread(void){
+	pthread_t thread;
+
+	void *thread_func(void *dummy){
+		while(1){
+			usleep(TICK_PERIOD_MS*1000);
+			kn_platform_linux_simulate_tick();
+			//printf("tick\n");
+		}
+		return NULL;
+	}
+
+	pthread_create(&thread, NULL, thread_func, NULL);
 }
