@@ -49,7 +49,7 @@ struct kn_schedulable_t{
 
 
 
-#define KN_SCHEDULABLE_INIT(_user_data, _schedule, _remaining_ticks, _priority) {\
+#define KN_SCHEDULABLE_INIT(_schedule, _remaining_ticks, _priority, _user_data) {\
 	.schedule=(_schedule),\
 	.remaining_ticks=(_remaining_ticks),\
 	.priority=(_priority),\

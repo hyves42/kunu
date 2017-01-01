@@ -15,17 +15,16 @@
  // instead of calling  kn_sched_get_default() and kn_tick_controller_get_default() always
 
 
-static void kn_timer_tick(int num_tick, void *user_data);
-static kn_schedulable_return_t kn_timer_schedule(kn_schedulable_t *s, void* user_data);
-static int kn_timer_remaining_ticks(kn_schedulable_t *s, void* user_data);
+
 
 
 
 int kn_timer_init(kn_timer_t *t, void (*timer_cb)(kn_timer_t *timer, void *user_data), void *user_data, int priority){
-	int ret=0;
 	if (!t){
 		return -1;
 	}
+	// static init. Can be done using macro KN_TIMER_INIT() as well
+
 	//setup schedulable interface
 	kn_schedulable_t *s=&t->schedulable;
 	s->schedule=kn_timer_schedule;
@@ -47,17 +46,27 @@ int kn_timer_init(kn_timer_t *t, void (*timer_cb)(kn_timer_t *timer, void *user_
 	t->is_armed=false;
 	t->must_repeat=false;
 
+	return kn_timer_runtime_init(t);
+}
+
+
+int kn_timer_runtime_init(kn_timer_t *t){
+	int ret=0;
+	if (!t){
+		return -1;
+	}
+
 	// Register schedulable and tick_client interfaces
-	ret = kn_sched_add_schedulable(kn_sched_get_default(), s);
+	ret = kn_sched_add_schedulable(kn_sched_get_default(), &t->schedulable);
 	if (ret<0) goto fail;
 
-	ret = kn_tick_register_client(kn_tick_controller_get_default(), ti);
+	ret = kn_tick_register_client(kn_tick_controller_get_default(), &t->tick);
 	if (ret<0) goto fail;
 
 	return ret;
 fail:
-	kn_sched_remove_schedulable(kn_sched_get_default(), s);
-	kn_tick_unregister_client(kn_tick_controller_get_default(), ti);
+	kn_sched_remove_schedulable(kn_sched_get_default(), &t->schedulable);
+	kn_tick_unregister_client(kn_tick_controller_get_default(), &t->tick);
 	return ret;
 }
 

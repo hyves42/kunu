@@ -14,7 +14,7 @@ START_TEST(component_tests_init)
 		KN_EVENT_REGISTER(3, NULL, NULL),
 	};
 	kn_event_reg_t out_disp_map[10]={};
-	kn_component_t component=KN_COMPONENT_INIT(component, buf, disp_map, out_disp_map);
+	kn_component_t component=KN_COMPONENT_INIT(component, buf, disp_map, out_disp_map, 1, NULL);
 
 
 	ck_assert(component.worker_if.user_data==&component);

@@ -23,4 +23,9 @@ struct kn_tick_client_t{
 	void *user_data;
 };
 
+
+#define KN_TICK_CLIENT_INIT(_tick_cb, _user_data){\
+	.tick=(_tick_cb),\
+	.user_data=(_user_data)}
+
 #endif //KN_TICK_CLIENT_H

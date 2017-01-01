@@ -28,20 +28,22 @@ struct kn_component_t{
 	//output dispatcher, dispatch events to other components
 	kn_event_dispatcher_t output_disp;
 	kn_fifo_t events_fifo;
+	void *user_data;
 };
 
 // example use :
 // kn_event_t buf[FIFO_SIZE_32];
 // kn_component_t c=KN_COMPONENT_INIT(c, buf);
-#define KN_COMPONENT_INIT(_comp, _fifo_buf, _input_disp_map, _output_disp_map, _priority) {\
+#define KN_COMPONENT_INIT(_self, _fifo_buf, _input_disp_map, _output_disp_map, _priority, _user_data) {\
 	.worker_if={\
 		.on_event=kn_component_on_event,\
-		.user_data=&(_comp),\
+		.user_data=&(_self),\
 	},\
-	.schedulable_if=KN_SCHEDULABLE_INIT(&(_comp), kn_component_schedule, NULL, _priority),\
+	.schedulable_if=KN_SCHEDULABLE_INIT(kn_component_schedule, NULL, _priority, &(_self)),\
 	.events_fifo=KN_FIFO_INIT(_fifo_buf),\
-	.input_disp=KN_EVENTDISP_INIT_WITH_FIXED_MAP(((_comp.input_disp)), (_input_disp_map)),\
-	.output_disp=KN_EVENTDISP_INIT_WITH_EMPTY_MAP((_comp.output_disp), (_output_disp_map))}
+	.input_disp=KN_EVENTDISP_INIT_WITH_FIXED_MAP(((_self.input_disp)), (_input_disp_map)),\
+	.output_disp=KN_EVENTDISP_INIT_WITH_EMPTY_MAP((_self.output_disp), (_output_disp_map)),\
+	.user_data=(_user_data)}
 
 //Public interface
 
