@@ -47,7 +47,10 @@ struct kn_component_t{
 
 //Public interface
 
-int kn_component_broadcast_event(kn_component_t *comp, kn_event_t *evt);
+int kn_component_publish_evt(kn_component_t *comp, kn_event_t *evt);
+
+int kn_component_add_listener(kn_component_t *comp, int event_id, kn_event_worker_t *worker);
+int kn_component_add_listener_comp(kn_component_t *comp, int event_id, kn_component_t *listener_component);
 
 //Protected interface. 
 //These functions need to be declared here to allow static initialization of struct
