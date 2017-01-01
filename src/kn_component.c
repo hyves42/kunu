@@ -8,14 +8,15 @@
  */
  
 #include "kn_component.h"
-
+#include <stdio.h>
 
 int kn_component_on_event(kn_event_worker_t *worker, kn_event_t *event){
-	kn_component_t *this=(kn_component_t*)worker->user_data;
+	kn_component_t *self=(kn_component_t*)worker->user_data;
 
-	kn_fifo_post(&(this->events_fifo), event);
-	this->schedulable_if.state=NEEDS_SCHEDULE;
+	int ret=kn_fifo_post(&(self->events_fifo), event);
+	self->schedulable_if.state=NEEDS_SCHEDULE;
 
+	printf("event! %d\n", ret);
 	return 0;
 }
 
@@ -25,7 +26,14 @@ kn_schedulable_return_t kn_component_schedule(kn_schedulable_t *s, void* user_da
 
 
 
-int kn_component_broadcast_event(kn_component_t *this, kn_event_t *evt){
-	evt->sender=&(this->worker_if);
+int kn_component_broadcast_event(kn_component_t *self, kn_event_t *evt){
+	if (!self || !evt){
+		return -1;
+	}
 
+	evt->sender=&(self->worker_if);
+	// TODO time stamp the event here
+
+
+	return kn_eventdisp_publish(&(self->output_disp), evt);
 }

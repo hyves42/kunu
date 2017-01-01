@@ -25,7 +25,6 @@ int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_t* a_map, int a_
 	disp->worker.user_data=disp;
 
 
-
 	// if a_map is already an ordered map of subscribers. accept it as is
 	// Just perform some basic safety tests
 	int last_id=0;
@@ -43,7 +42,37 @@ int kn_eventdisp_init(kn_event_dispatcher_t *disp, kn_event_reg_t* a_map, int a_
 	return 0;
 }
 
-int kn_eventdisp_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count){
+
+// wrapper function to convert a callback call to an event worker call
+void _handler_to_event_worker(kn_event_t *event, void *user_data){
+	kn_event_worker_t* worker=(kn_event_worker_t*)user_data;
+
+	if (worker && worker->on_event){
+		worker->on_event(worker, event);
+	}
+}
+
+
+int kn_eventdisp_subscribe(kn_event_dispatcher_t *disp, int event_id, 
+	void (*handler)(kn_event_t *, void *), void *user_data){
+
+	kn_event_reg_t reg=KN_EVENT_REGISTER(event_id, handler, user_data);
+
+	return kn_eventdisp_subscribe_reg(disp, &reg);
+}
+
+int kn_eventdisp_subscribe_worker(kn_event_dispatcher_t *disp,  int event_id, kn_event_worker_t* worker){
+	kn_event_reg_t reg=KN_EVENT_REGISTER(event_id, _handler_to_event_worker, worker);
+
+	// protection against infinite dispatch loops
+	if (worker == &disp->worker){
+		return -1;
+	}
+	return kn_eventdisp_subscribe_reg(disp, &reg);
+}
+
+
+int kn_eventdisp_subscribe_reg_array(kn_event_dispatcher_t *disp, kn_event_reg_t* array, int elt_count){
 	int i=0;
 	int ret=0;
 	if (!disp || !array){
@@ -51,7 +80,7 @@ int kn_eventdisp_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event
 	}
 
 	for (i=0; i<elt_count; i++){
-		ret=kn_eventdisp_register_subscriber(disp, &array[i]);
+		ret=kn_eventdisp_subscribe_reg(disp, &array[i]);
 		if (ret<0){
 			return ret;
 		}
@@ -59,7 +88,7 @@ int kn_eventdisp_register_subscriber_array(kn_event_dispatcher_t *disp, kn_event
 	return 0;
 }
 
-int kn_eventdisp_register_subscriber(kn_event_dispatcher_t *disp, kn_event_reg_t* event_reg){
+int kn_eventdisp_subscribe_reg(kn_event_dispatcher_t *disp, kn_event_reg_t* event_reg){
 	int i=0, j=0;
 	int id;
 	if (!disp || !event_reg){
@@ -105,16 +134,17 @@ int kn_eventdisp_get_registered_count(kn_event_dispatcher_t *disp){
 
 
 int kn_eventdisp_on_event(kn_event_worker_t *worker, kn_event_t *event){
-	kn_event_dispatcher_t *disp=(kn_event_dispatcher_t *)worker->user_data;
-	if (disp){
-		return kn_eventdisp_broadcast(disp, event);
+	if (!worker || !worker->user_data || !event){
+		return -1;
 	}
-	return -1;
+
+	kn_event_dispatcher_t *disp=(kn_event_dispatcher_t *)worker->user_data;
+	return kn_eventdisp_publish(disp, event);
 }
 
 
 
-int kn_eventdisp_broadcast(kn_event_dispatcher_t *disp, kn_event_t *event){
+int kn_eventdisp_publish(kn_event_dispatcher_t *disp, kn_event_t *event){
 	if (!disp || !disp->map){
 		return -1;
 	}
