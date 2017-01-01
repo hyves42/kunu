@@ -51,6 +51,9 @@ int kn_platform_sleep_for(int ticks){
 	}};
 	int count=0;
 
+	if (ticks==0){
+		return 0;
+	}
 
 	if (pipe_fd[read_id]<0){
 		return -1;
@@ -73,7 +76,7 @@ int kn_platform_sleep_for(int ticks){
 }
 
 int kn_platform_sleep_forever(void){
-	return kn_platform_sleep_for(0);
+	return kn_platform_sleep_for(-1);
 }
 
 int kn_platform_linux_simulate_interrupt(void){

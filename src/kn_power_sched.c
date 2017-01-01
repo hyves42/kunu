@@ -32,6 +32,9 @@ int kn_power_sched_run(void){
 
 	//Sleep until next date where some work is scheduled
 	int ticks = sched_get_remaining_ticks(sched);
+	if (ticks==0){
+		return 0;
+	}
 	int slept_ticks=0;
 
 	//printf("need to sleep for %d ticks\n", ticks);
@@ -47,4 +50,10 @@ int kn_power_sched_run(void){
 	// Here notify everyone interested that we woke up
 
 	return slept_ticks;
+}
+
+void kn_power_sched_run_forever(void){
+	while(1){
+		kn_power_sched_run();
+	}
 }

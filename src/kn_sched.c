@@ -33,6 +33,15 @@ int kn_sched_add_schedulable(kn_sched_t *s, kn_schedulable_t *schedulable){
 		return -1;
 	}
 
+	// It is forbidden to add the same schedulable twice
+	for (i=0; i<s->schedulable_count; i++){
+		if (s->schedulables[i] == schedulable){
+			return -1;
+		}
+	}
+
+
+
 	// Not the smartest implementation but it does the job for now
 	// we have like 16 schedulable objects at most
 	for (i=0; i<s->schedulable_count; i++){

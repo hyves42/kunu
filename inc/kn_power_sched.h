@@ -17,5 +17,7 @@ int kn_power_sched_init(kn_sched_t* s, kn_tick_controller_t *t);
 
 int kn_power_sched_run(void);
 
+void kn_power_sched_run_forever(void);
+
 
 #endif //KN_POWER_SCHED_H
