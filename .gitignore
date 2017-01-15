@@ -34,4 +34,4 @@
 
 # project-specific files
 test_projects/test_project
-tests/test
+unit_tests/test
