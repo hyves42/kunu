@@ -7,18 +7,19 @@
 # Full text of license is in /LICENSE file
 
 
-TARGET_ARCH=x86-linux
+TARGET_ARCH=arm-cortex-m0
 
-CC		:= gcc
-CXX		:= g++
-LD		:= gcc
-AR		:= ar
-AS		:= as
-OBJCOPY		:= objcopy
-OBJDUMP		:= objdump
-GDB		:= gdb
+PREFIX		?= arm-none-eabi
+CC		:= $(PREFIX)-gcc
+CXX		:= $(PREFIX)-g++
+LD		:= $(PREFIX)-gcc
+AR		:= $(PREFIX)-ar
+AS		:= $(PREFIX)-as
+OBJCOPY		:= $(PREFIX)-objcopy
+OBJDUMP		:= $(PREFIX)-objdump
+GDB		:= $(PREFIX)-gdb
 
-CFLAGS =
+CFLAGS =  -msoft-float -mthumb -mcpu=cortex-m0
 
 KUNU_TOPDIR=../..
 include ../../kunu.files.mk
