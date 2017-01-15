@@ -303,7 +303,7 @@ START_TEST(machine_kn_state_transition_simple)
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited==false);
 	ck_assert(top_state_entered==false);
-	ck_assert(top_state_exited=false);
+	ck_assert(top_state_exited==false);
 	ck_assert(machine.current_state==&machine.states[STATE_1]);	
 
 	tests_reset_flags();
@@ -317,7 +317,7 @@ START_TEST(machine_kn_state_transition_simple)
 	ck_assert(state2_entered);
 	ck_assert(state2_exited==false);
 	ck_assert(top_state_entered==false);
-	ck_assert(top_state_exited=false);
+	ck_assert(top_state_exited==false);
 	ck_assert(machine.current_state==&machine.states[STATE_2]);
 
 	tests_reset_flags();
@@ -331,7 +331,7 @@ START_TEST(machine_kn_state_transition_simple)
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited);
 	ck_assert(top_state_entered==false);
-	ck_assert(top_state_exited=false);
+	ck_assert(top_state_exited==false);
 	ck_assert(machine.current_state==&machine.states[STATE_0]);
 
 }
@@ -369,7 +369,7 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited==false);
 	ck_assert(top_state_entered==false);
-	ck_assert(top_state_exited=false);
+	ck_assert(top_state_exited==false);
 	ck_assert(machine.current_state==&machine.states[STATE_1]);	
 
 	tests_reset_flags();
@@ -383,7 +383,7 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state2_entered);
 	ck_assert(state2_exited==false);
 	ck_assert(top_state_entered==false);
-	ck_assert(top_state_exited=false);
+	ck_assert(top_state_exited==false);
 	ck_assert(machine.current_state==&machine.states[STATE_2]);
 
 	tests_reset_flags();
@@ -397,7 +397,7 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited);
 	ck_assert(top_state_entered==false);
-	ck_assert(top_state_exited=false);
+	ck_assert(top_state_exited==false);
 	ck_assert(machine.current_state==&machine.states[STATE_0]);
 
 	tests_reset_flags();
@@ -411,7 +411,7 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state2_entered);
 	ck_assert(state2_exited==false);
 	ck_assert(top_state_entered==false);
-	ck_assert(top_state_exited=false);
+	ck_assert(top_state_exited==false);
 	ck_assert(machine.current_state==&machine.states[STATE_2]);
 }
 END_TEST
