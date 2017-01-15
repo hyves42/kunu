@@ -175,9 +175,15 @@ START_TEST(kn_sched_tests_add_schedulables_limit)
 		.user_data=(void*)0xdeadbeef,
 		.priority=1,
 	};
+	// I need many copies of this schedulable to test limits
+	kn_schedulable_t schedulable_array[SCHEDULABLES_SIZE];
+	for (i=0; i<SCHEDULABLES_SIZE; i++){
+		schedulable_array[i]=schedable;
+	}
+
 
 	for (i=0; i<SCHEDULABLES_SIZE; i++){
-		ret=kn_sched_add_schedulable(&sched, &schedable);
+		ret=kn_sched_add_schedulable(&sched, &schedulable_array[i]);
 		ck_assert(ret == 0);
 	}
 
@@ -198,6 +204,27 @@ START_TEST(kn_sched_tests_add_bad_schedulables)
 		.user_data=NULL,
 		.priority=1,
 	};
+
+	ret=kn_sched_add_schedulable(&sched, &schedable);
+	ck_assert(ret < 0);
+
+}
+END_TEST
+
+START_TEST(kn_sched_tests_add_same_schedulable_twice)
+{
+	kn_sched_t sched=KN_SCHED_INIT_VALUE;
+	int i, ret;
+
+	kn_schedulable_t schedable={
+		.schedule=dummy_schedule,
+		.remaining_ticks=dummy_remaining_ticks,
+		.user_data=(void*)0xdeadbeef,
+		.priority=1,
+	};
+
+	ret=kn_sched_add_schedulable(&sched, &schedable);
+	ck_assert(ret == 0);
 
 	ret=kn_sched_add_schedulable(&sched, &schedable);
 	ck_assert(ret < 0);
@@ -283,6 +310,7 @@ int tests_sched_run(void){
 	tcase_add_test(tc1_1, kn_sched_tests_add_schedulables2);
 	tcase_add_test(tc1_1, kn_sched_tests_add_schedulables_limit);
 	tcase_add_test(tc1_1, kn_sched_tests_add_bad_schedulables);
+	tcase_add_test(tc1_1, kn_sched_tests_add_same_schedulable_twice);
 	tcase_add_test(tc1_1, kn_sched_tests_remove_schedulables);
 
 	srunner_run_all(sr, CK_ENV);
