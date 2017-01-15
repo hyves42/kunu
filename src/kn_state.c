@@ -21,6 +21,10 @@ int kn_machine_init(kn_state_machine_t *machine, unsigned int default_state){
 	}
 
 	for (i=0; i < machine->states_count; i++){
+		// States that don't have a parent must have top level as parent
+		if (!machine->states[i].parent){
+			machine->states[i].parent=&machine->top_level_state;
+		}
 		if (machine->states[i].interface.init){
 			machine->states[i].interface.init(&machine->states[i], machine);
 		}

@@ -60,8 +60,12 @@ struct kn_state_machine_t{
 	.parent=(par),\
 	.interface=KN_INTERFACE_DEFINE(prefix)}
 
+
+// A macro to initialize a state without a parent
+// In practice, the machine top level will be their parent
 #define KN_STATE_INIT(prefix) KN_STATE_INIT_SUB(NULL, prefix)
 
+// A macro to initialize a state with a parent
 #define KN_STATE_MACHINE_INIT(top_level_prefix, states_array) {\
 	.top_level_state=KN_STATE_INIT(top_level_prefix),\
 	.current_state=NULL,\

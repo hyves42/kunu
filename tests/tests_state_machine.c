@@ -40,7 +40,8 @@ enum STATES{
 };
 
 
-//Typical implementation of machine for tests
+// Typical implementation of machine for tests
+// The implementations set flags to check if they were called during test
 static void top_state_init(kn_state_t *self, kn_state_machine_t *m){
 	ck_assert(m==machine_p);
 	ck_assert(self==&m->top_level_state);
@@ -129,7 +130,9 @@ static int state2_on_event(kn_state_t *self, kn_state_machine_t *m, kn_event_t *
 	return KN_EVENT_HANDLED;
 }
 
-static void reset_flags(void){
+// Reset all flags related to machine test
+// Shall be called before each test
+static void tests_reset_flags(void){
 	top_state_initialized=false;
 	state0_initialized=false;
 	state1_initialized=false;
@@ -210,7 +213,7 @@ START_TEST(kn_machine_init_with_states2)
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
 
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == states);
 	ck_assert(machine.states_count == STATES_COUNT);
 
@@ -244,7 +247,7 @@ START_TEST(kn_machine_init_with_states4)
 
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == states);
 	ck_assert(machine.states_count == STATES_COUNT);
 
@@ -259,7 +262,7 @@ START_TEST(kn_machine_init_with_states5)
 {
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, NULL);
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == NULL);
 
 	int ret = kn_machine_init(&machine, 0);
@@ -280,7 +283,7 @@ START_TEST(machine_kn_state_transition_simple)
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
 
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == states);
 	ck_assert(machine.states_count == STATES_COUNT);
 
@@ -289,7 +292,7 @@ START_TEST(machine_kn_state_transition_simple)
 	ck_assert(ret==0);
 	ck_assert(machine.current_state==&machine.states[STATE_0]);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_1);
 	ck_assert(ret==0);
@@ -299,9 +302,11 @@ START_TEST(machine_kn_state_transition_simple)
 	ck_assert(state1_exited==false);
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited==false);
+	ck_assert(top_state_entered==false);
+	ck_assert(top_state_exited=false);
 	ck_assert(machine.current_state==&machine.states[STATE_1]);	
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_2);
 	ck_assert(ret==0);
@@ -311,9 +316,11 @@ START_TEST(machine_kn_state_transition_simple)
 	ck_assert(state1_exited);
 	ck_assert(state2_entered);
 	ck_assert(state2_exited==false);
+	ck_assert(top_state_entered==false);
+	ck_assert(top_state_exited=false);
 	ck_assert(machine.current_state==&machine.states[STATE_2]);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_0);
 	ck_assert(ret==0);
@@ -323,6 +330,8 @@ START_TEST(machine_kn_state_transition_simple)
 	ck_assert(state1_exited==false);
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited);
+	ck_assert(top_state_entered==false);
+	ck_assert(top_state_exited=false);
 	ck_assert(machine.current_state==&machine.states[STATE_0]);
 
 }
@@ -340,7 +349,7 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
 
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == states);
 	ck_assert(machine.states_count == STATES_COUNT);
 
@@ -349,7 +358,7 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(ret==0);
 	ck_assert(machine.current_state==&machine.states[STATE_0]);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_1);
 	ck_assert(ret==0);
@@ -359,9 +368,11 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state1_exited==false);
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited==false);
+	ck_assert(top_state_entered==false);
+	ck_assert(top_state_exited=false);
 	ck_assert(machine.current_state==&machine.states[STATE_1]);	
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_2);
 	ck_assert(ret==0);
@@ -371,9 +382,11 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state1_exited==false);
 	ck_assert(state2_entered);
 	ck_assert(state2_exited==false);
+	ck_assert(top_state_entered==false);
+	ck_assert(top_state_exited=false);
 	ck_assert(machine.current_state==&machine.states[STATE_2]);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_0);
 	ck_assert(ret==0);
@@ -383,9 +396,11 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state1_exited);
 	ck_assert(state2_entered==false);
 	ck_assert(state2_exited);
+	ck_assert(top_state_entered==false);
+	ck_assert(top_state_exited=false);
 	ck_assert(machine.current_state==&machine.states[STATE_0]);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_2);
 	ck_assert(ret==0);
@@ -395,6 +410,8 @@ START_TEST(machine_kn_state_transition_hierarchical)
 	ck_assert(state1_exited==false);
 	ck_assert(state2_entered);
 	ck_assert(state2_exited==false);
+	ck_assert(top_state_entered==false);
+	ck_assert(top_state_exited=false);
 	ck_assert(machine.current_state==&machine.states[STATE_2]);
 }
 END_TEST
@@ -412,7 +429,7 @@ START_TEST(machine_state_event_send_simple)
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
 
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == states);
 	ck_assert(machine.states_count == STATES_COUNT);
 
@@ -424,7 +441,7 @@ START_TEST(machine_state_event_send_simple)
 	kn_machine_send_event(&machine, 0);
 	ck_assert(state0_event);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_1);
 	ck_assert(ret==0);
@@ -433,7 +450,7 @@ START_TEST(machine_state_event_send_simple)
 	kn_machine_send_event(&machine, 0);
 	ck_assert(state1_event);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_2);
 	ck_assert(ret==0);
@@ -441,7 +458,7 @@ START_TEST(machine_state_event_send_simple)
 
 	kn_machine_send_event(&machine, 0);
 	ck_assert(state2_event);
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_0);
 	ck_assert(ret==0);
@@ -465,7 +482,7 @@ START_TEST(machine_state_event_send_hierarchical)
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
 
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == states);
 	ck_assert(machine.states_count == STATES_COUNT);
 
@@ -477,7 +494,7 @@ START_TEST(machine_state_event_send_hierarchical)
 	kn_machine_send_event(&machine, 0);
 	ck_assert(state0_event);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_1);
 	ck_assert(ret==0);
@@ -486,7 +503,7 @@ START_TEST(machine_state_event_send_hierarchical)
 	kn_machine_send_event(&machine, 0);
 	ck_assert(state1_event);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_2);
 	ck_assert(ret==0);
@@ -494,7 +511,7 @@ START_TEST(machine_state_event_send_hierarchical)
 
 	kn_machine_send_event(&machine, 0);
 	ck_assert(state2_event);
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_0);
 	ck_assert(ret==0);
@@ -533,7 +550,7 @@ START_TEST(machine_state_event_send_hierarchical2)
 	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
 
 	machine_p=&machine;
-	reset_flags();
+	tests_reset_flags();
 	ck_assert(machine.states == states);
 	ck_assert(machine.states_count == STATES_COUNT);
 
@@ -547,7 +564,7 @@ START_TEST(machine_state_event_send_hierarchical2)
 	ck_assert(state1_event==false);
 	ck_assert(state2_event==false);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_1);
 	ck_assert(ret==0);
@@ -558,7 +575,7 @@ START_TEST(machine_state_event_send_hierarchical2)
 	ck_assert(state1_event);
 	ck_assert(state2_event==false);
 
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_2);
 	ck_assert(ret==0);
@@ -568,7 +585,7 @@ START_TEST(machine_state_event_send_hierarchical2)
 	ck_assert(state0_event==false);
 	ck_assert(state1_event);
 	ck_assert(state2_event);
-	reset_flags();
+	tests_reset_flags();
 
 	ret = kn_machine_set_state(&machine, STATE_0);
 	ck_assert(ret==0);
@@ -582,6 +599,54 @@ START_TEST(machine_state_event_send_hierarchical2)
 }
 END_TEST
 
+
+START_TEST(machine_state_event_send_hierarchical_top)
+{	
+	//specific implementation for this test case
+	void state2__init(kn_state_t *self, kn_state_machine_t *m){
+		state2_init(self, m);
+	}
+	void state2__enter(kn_state_t *self, kn_state_machine_t *m){
+		state2_enter(self, m);
+	}
+	void state2__quit(kn_state_t *self, kn_state_machine_t *m){
+		state2_quit(self, m);
+	}
+	int state2__on_event(kn_state_t *self, kn_state_machine_t *m, kn_event_t *event){
+		state2_on_event(self, m, event);
+		return KN_EVENT_UNHANDLED; // simulate unhandled event, see if it is transfered to state 1
+	}
+
+	kn_state_t states[STATES_COUNT]={
+		[STATE_0]=KN_STATE_INIT(state0),
+		[STATE_1]=KN_STATE_INIT(state1),
+		[STATE_2]=KN_STATE_INIT(state2_),
+	};
+
+	kn_state_machine_t machine=KN_STATE_MACHINE_INIT(top_state, states);
+
+	machine_p=&machine;
+	tests_reset_flags();
+	ck_assert(machine.states == states);
+	ck_assert(machine.states_count == STATES_COUNT);
+
+	int ret = kn_machine_init(&machine, STATE_0);
+	ck_assert(state0_entered);
+	ck_assert(ret==0);
+	ck_assert(machine.current_state==&machine.states[STATE_0]);
+
+	tests_reset_flags();
+
+	ret = kn_machine_set_state(&machine, STATE_2);
+	ck_assert(ret==0);
+	ck_assert(machine.current_state==&machine.states[STATE_2]);
+
+	kn_machine_send_event(&machine, 0);
+	ck_assert(state0_event==false);
+	ck_assert(top_state_event);
+	ck_assert(state2_event);
+}
+END_TEST
 
 
 int tests_state_machine_run(void){
