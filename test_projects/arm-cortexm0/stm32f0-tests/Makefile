@@ -17,10 +17,13 @@ systick-sleep_OBJS = $(systick-sleep_SRC:.c=.o)
 uart-blocking_SRC = uart-blocking.c
 uart-blocking_OBJS = $(uart-blocking_SRC:.c=.o)
 
+uart-interrupt_SRC = uart-interrupt.c
+uart-interrupt_OBJS = $(uart-interrupt_SRC:.c=.o)
+
 wut-sleep_SRC = wut-sleep.c
 wut-sleep_OBJS = $(wut-sleep_SRC:.c=.o)
 
-TARGET = systick-sleep.elf uart-blocking.elf wut-sleep.elf
+TARGET = systick-sleep.elf uart-blocking.elf uart-interrupt.elf wut-sleep.elf
 TARGET_BIN = $(patsubst %.elf,%.bin, $(TARGET))
 TARGET_HEX = $(patsubst %.elf,%.hex, $(TARGET))
 
@@ -86,7 +89,8 @@ wut-sleep.elf: $(wut-sleep_OBJS)
 	$(LD) $^ $(LDFLAGS)  -o $@
 
 
-
+uart-interrupt.elf: $(uart-interrupt_OBJS)
+	$(LD) $^ $(LDFLAGS)  -o $@
 
 
 flash:
